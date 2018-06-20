@@ -51,6 +51,8 @@ class Config extends DefaultStdClass
      */
     protected $wsdlAtendeCliente = self::WSDL_ATENDE_CLIENTE_DEVELOPMENT;
 
+    protected $wsdlLogisticaReversa = self::WSDL_LOGISTICA_REVERSA_PRODUCTION;
+
     /**
      * @var string
      */
@@ -157,9 +159,9 @@ class Config extends DefaultStdClass
              */
             if ($this->getLogisticaReversa() == true) {
                 if ($env == self::ENV_DEVELOPMENT) {
-                    $this->setWsdlAtendeCliente(self::WSDL_LOGISTICA_REVERSA_PRODUCTION);
+                    $this->setWsdlLogisticaReversa(self::WSDL_LOGISTICA_REVERSA_DEVELOPMENT);
                 } else {
-                    $this->setWsdlAtendeCliente(self::WSDL_LOGISTICA_REVERSA_PRODUCTION);
+                    $this->setWsdlLogisticaReversa(self::WSDL_LOGISTICA_REVERSA_PRODUCTION);
                 }
             }  else {
                 if ($env == self::ENV_DEVELOPMENT) {
@@ -176,7 +178,18 @@ class Config extends DefaultStdClass
 
     public function getWsdlLogisticaReversa ()
     {
-        return self::WSDL_LOGISTICA_REVERSA_PRODUCTION;
+        return $this->wsdlLogisticaReversa;
+    }
+
+    /**
+     * @param string $wsdlLogisticaReversa
+     * @return $this
+     */
+    public function setWsdlLogisticaReversa($wsdlLogisticaReversa)
+    {
+        $this->wsdlLogisticaReversa = $wsdlLogisticaReversa;
+
+        return $this;
     }
 
     /**
