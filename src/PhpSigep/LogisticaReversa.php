@@ -120,10 +120,9 @@ class LogisticaReversa extends Bootstrap {
         }
 
         /**
-         * Coletas Solicitadas, agrupa remetente, pacote para embalagem (produto) e produtos (objcol)
+         * Coletas Solicitadas, agrupa remetente e produtos (objcol)
          */
         $object->coletas_solicitadas['remetente'] = $remetente;
-        $object->coletas_solicitadas['produto'] = new Produto(['tipo' => '0', 'codigo' => '765000636', 'qtd' => '1']);
         $object->coletas_solicitadas['obj_col'] = $produtos;
         $coletasSolicitadas = new ColetasSolicitadas($object->coletas_solicitadas);
 
