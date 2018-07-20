@@ -31,6 +31,9 @@ class LogisticaReversa extends Bootstrap {
      */
     private $accessData;
 
+    const TIPO_COLETA = 'C';
+    const TIPO_POSTAGEM = 'A';
+
     /**
      * LogisticaReversa constructor.
      */
@@ -154,6 +157,7 @@ class LogisticaReversa extends Bootstrap {
         ];
         $accessObject = new \PhpSigep\Model\AccessData($accessData);
 
+        $tipoSolicitacao = $data['tipoSolicitacao'] ?? self::TIPO_POSTAGEM;
         /**
          * Define os dados de autenticação.
          */
@@ -165,7 +169,7 @@ class LogisticaReversa extends Bootstrap {
         $acompanhaPostagem = new \PhpSigep\Model\AcompanhaPostagemReversa();
         $acompanhaPostagem->setAccessData($accessObject);
         $acompanhaPostagem->setTipoBusca('H');
-        $acompanhaPostagem->setTipoSolicitacao('A');
+        $acompanhaPostagem->setTipoSolicitacao($tipoSolicitacao);
         $acompanhaPostagem->setNumeroPedido($data['tracking_code']);
 
         return $phpSigep->acompanharPostagemReversa($acompanhaPostagem)->getResult();
