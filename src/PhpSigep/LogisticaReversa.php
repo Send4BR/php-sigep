@@ -123,13 +123,7 @@ class LogisticaReversa extends Bootstrap {
         }
 
         if (isset($solicitacaoDePostagem['embalagem'])) {
-            if (!isset($solicitacaoDePostagem['embalagem']['tipo']) || 
-                empty($solicitacaoDePostagem['embalagem']['tipo']) ||
-                !isset($solicitacaoDePostagem['embalagem']['codigo']) || 
-                empty($solicitacaoDePostagem['embalagem']['codigo']) ||
-                !isset($solicitacaoDePostagem['embalagem']['qtd']) ||
-                empty($solicitacaoDePostagem['embalagem']['qtd'])) {
-                
+            if (!isEmbalagemValid($solicitacaoDePostagem['embalagem'])) {
                 return (object) [
                     'success' => false,
                     'error' => 'Informação de embalagem incompleta'
@@ -224,4 +218,22 @@ class LogisticaReversa extends Bootstrap {
 
     }
 
+}
+
+function isEmbalagemValid($embalagem) {
+    if (!isset($embalagem['tipo']) || 
+        !isValidValue($embalagem['tipo']) ||
+        !isset($embalagem['codigo']) || 
+        !isValidValue($embalagem['codigo']) ||
+        !isset($embalagem['qtd']) ||
+        !isValidValue($embalagem['qtd'])) {
+        
+        return false;
+    }
+    return true;
+}
+
+
+function isValidValue($value) {
+    return (!empty($value) && $value = '0');
 }
