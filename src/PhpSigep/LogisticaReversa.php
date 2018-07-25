@@ -122,6 +122,23 @@ class LogisticaReversa extends Bootstrap {
             }
         }
 
+        if (isset($solicitacaoDePostagem['embalagem'])) {
+            if (!isset($solicitacaoDePostagem['embalagem']['tipo']) || 
+                empty($solicitacaoDePostagem['embalagem']['tipo']) ||
+                !isset($solicitacaoDePostagem['embalagem']['codigo']) || 
+                empty($solicitacaoDePostagem['embalagem']['codigo']) ||
+                !isset($solicitacaoDePostagem['embalagem']['qtd']) ||
+                empty($solicitacaoDePostagem['embalagem']['qtd'])) {
+                
+                return (object) [
+                    'success' => false,
+                    'error' => 'Informação de embalagem incompleta'
+                ];
+            }
+
+            $object->coletas_solicitadas['produto'] = new Produto($solicitacaoDePostagem['embalagem']);
+        }
+
         /**
          * Coletas Solicitadas, agrupa remetente e produtos (objcol)
          */
