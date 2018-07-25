@@ -235,5 +235,5 @@ function isEmbalagemValid($embalagem) {
 
 
 function isValidValue($value) {
-    return (!empty($value) && $value == '0');
+    return (!empty($value) || $value == '0');
 }
