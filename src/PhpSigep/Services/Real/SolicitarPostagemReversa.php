@@ -69,7 +69,7 @@ class SolicitarPostagemReversa
                 throw $r;
             }
 
-            if ($r && $r->solicitarPostagemReversa) {
+            if ($r && $r->solicitarPostagemReversa && $r->solicitarPostagemReversa->resultado_solicitacao) {
                 return $r->solicitarPostagemReversa->resultado_solicitacao;
 
             } else {
