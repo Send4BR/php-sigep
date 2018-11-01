@@ -48,7 +48,8 @@ class VerificaDisponibilidadeServico
             $errorMsg = SoapClientFactory::convertEncoding($r->getMessage());
             $result->setSoapFault($r);
         } else if ($r instanceof \stdClass && property_exists($r, 'return')) {
-            $disponivel = $r->return === '0#' ? true : false;
+            $responseCode = (int) strtok($r->return, '#');
+            $disponivel = $responseCode >= 0 ? true : false;
             $result->setResult(new VerificaDisponibilidadeServicoResposta(array('disponivel' => $disponivel)));
             $cache->setItem($cacheKey, serialize($result));
         } else {
