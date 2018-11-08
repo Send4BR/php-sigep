@@ -75,7 +75,7 @@ class SolicitarPostagemReversa
             } else {
                 $result->setErrorCode(0);
                 $result->setErrorMsg('A resposta do Correios não está no formato esperado. Resposta recebida: "' .
-                    $r . '"');
+                    var_export($r, true) . '"');
             }
 
         } catch (\Exception $e) {
