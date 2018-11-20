@@ -186,6 +186,31 @@ class LogisticaReversa extends Bootstrap {
         return $phpSigep->acompanharPostagemReversa($acompanhaPostagem)->getResult();
     }
 
+    public function cancelTracking($data)
+    {
+        $accessData = [
+            'usuario'           => $data['usuario'],
+            'senha'             => $data['senha'],
+            'codAdministrativo' => $data['codAdministrativo'],
+            'cartaoPostagem'    => $data['cartaoPostagem']
+        ];
+        $accessObject = new \PhpSigep\Model\AccessData($accessData);
+        /**
+         * Define os dados de autenticação.
+         */
+        $this->init($accessData);
+
+        $this->instance->config->setAccessData($accessObject);
+
+        $phpSigep = new Real();
+        $cancelaPostagem = new \PhpSigep\Model\CancelaPostagemReversa();
+        $cancelaPostagem->setAccessData($accessObject);
+        $cancelaPostagem->setTipo($data['tipo']);
+        $cancelaPostagem->setNumeroPedido($$data['numero_pedido']);
+
+        return $phpSigep->cancelarPostagemReversa($cancelaPostagem)->getResult();
+    }
+    
     public function trackingObjectNumber ($data)
     {
 

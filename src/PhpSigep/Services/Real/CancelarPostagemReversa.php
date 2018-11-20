@@ -32,7 +32,7 @@ class CancelarPostagemReversa
 
         $result = new Result();
         try {
-            $r = SoapClientFactory::getSoapClient()->cancelarPedido($soapArgs);
+            $r = SoapClientFactory::getSoapClient(true)->cancelarPedido($soapArgs);
 
             if (class_exists('\StaLib_Logger',false)) {
                 \StaLib_Logger::log('Retorno SIGEP cancelarPedido: ' . print_r($r, true));
