@@ -67,6 +67,7 @@ class ServicoDePostagem extends AbstractModel
         self::SERVICE_PAC_CONTRATO_AGENCIA       => array('PAC Contrato Agência', 124884),
         self::SERVICE_SEDEX_REVERSO_CONTRATO_AGENCIA => array('SEDEX Reverso Contrato Agência', 124849),
         self::SERVICE_PAC_REVERSO_CONTRATO_AGENCIA   => array('PAC Reverso Contrato Agência', 124884),
+        self::SERVICE_SEDEX_REVERSO_LM           => array('SEDEX Reverso LM', null),
     );
 
     /**
