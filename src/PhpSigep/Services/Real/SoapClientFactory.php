@@ -65,7 +65,8 @@ class SoapClientFactory
             'trace'                 => (int) Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
             'exceptions'            => (bool) Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
             'connection_timeout'    => 180,
-            'stream_context'        => stream_context_create($opts)
+            'stream_context'        => stream_context_create($opts),
+            'wsdl_cache'            => WSDL_CACHE_BOTH
         );
 
         if (Bootstrap::getConfig()->getLogisticaReversa()) {
