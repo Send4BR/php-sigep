@@ -36,14 +36,19 @@ class LogisticaReversa extends Bootstrap {
 
     /**
      * LogisticaReversa constructor.
+     * @param Config|null $config
+     * @throws \PhpSigep\BootstrapException
+     * @throws \PhpSigep\Model\Exception
      */
-    public function __construct()
+    public function __construct(Config $config=null)
     {
-        $config = new Config();
+
+        $config = isset($config)?$config:new Config();
         $config->setLogisticaReversa(true);
         $config->setEnv($config::ENV_PRODUCTION, false); // TODO fix
         $this->instance = new \StdClass;
         $this->instance->config = $config;
+        parent::__construct($config);
     }
 
     /**
@@ -57,7 +62,7 @@ class LogisticaReversa extends Bootstrap {
         $accessDataInstance = new AccessData($accessData);
         $this->instance->config->setAccessData($accessDataInstance);
         $this->accessData = $this->instance->config->getAccessData();
-        parent::__construct($this->instance->config);
+        parent::start($this->instance->config);
     }
 
     /**
