@@ -6,7 +6,7 @@
  * Time: 15:41
  */
 
-namespace Api\PostalCodes\Soap;
+namespace PhpSigep\Services\Real;
 
 
 class CURLSoapClient extends \SoapClient
