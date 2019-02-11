@@ -7,7 +7,9 @@
 
 namespace PhpSigep\Services\Real;
 
+use Api\PostalCodes\Soap\CURLSoapClient;
 use PhpSigep\Bootstrap;
+use PhpSigep\BootstrapException;
 use PhpSigep\Config;
 use PhpSigep\Services\Real\Exception\SoapExtensionNotInstalled;
 
@@ -37,7 +39,7 @@ class SoapClientFactory
 
         $wsdl = Bootstrap::getConfig()->getWsdlAtendeCliente();
 
-        if ($tracking){
+        if ($tracking) {
             $wsdl = Bootstrap::getConfig()->getWsdlLogisticaReversa();
         }
 
@@ -47,34 +49,45 @@ class SoapClientFactory
          * http://localhost/logisticaReversaWS.xsd
          */
 
-        $opts = array(
-            'ssl' => array(
+        $opts = [
+            'ssl' => [
                 //'ciphers'           =>'RC4-SHA', // comentado o parâmetro ciphers devido ao erro que ocorre quando usado dados de ambiente de produção em um servidor local conforme issue https://github.com/stavarengo/php-sigep/issues/35#issuecomment-290081903
                 'verify_peer'       => false,
                 'verify_peer_name'  => false,
                 'allow_self_signed' => true,
-            )
-        );
+            ],
+        ];
 
         // SOAP 1.1 client
-        $params = array (
-            'encoding'              => self::WEB_SERVICE_CHARSET,
-            'verifypeer'            => false,
-            'verifyhost'            => false,
-            'soap_version'          => SOAP_1_1,
-            'trace'                 => (int) Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
-            'exceptions'            => (bool) Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
-            'connection_timeout'    => 180,
-            'stream_context'        => stream_context_create($opts),
-            'wsdl_cache'            => WSDL_CACHE_BOTH
-        );
+        $params = [
+            'encoding'           => self::WEB_SERVICE_CHARSET,
+            'verifypeer'         => false,
+            'verifyhost'         => false,
+            'soap_version'       => SOAP_1_1,
+            'trace'              => (int)Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
+            'exceptions'         => (bool)Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
+            'connection_timeout' => 180,
+            'stream_context'     => stream_context_create($opts),
+            'wsdl_cache'         => WSDL_CACHE_BOTH,
+        ];
 
         if (Bootstrap::getConfig()->getLogisticaReversa()) {
             $params['login'] = Bootstrap::getConfig()->getAccessData()->getUsuario();
             $params['password'] = Bootstrap::getConfig()->getAccessData()->getSenha();
         }
 
-        return self::$_soapClient = new \SoapClient($wsdl, $params);
+        return self::$_soapClient = self::newSoapClient($wsdl, $params);
+    }
+
+    private static function newSoapClient($wsdl, $options)
+    {
+        try {
+            if (Bootstrap::getConfig()->useCURLClient()) {
+                return new CURLSoapClient($wsdl, $options);
+            }
+        } catch (BootstrapException $e) {
+        }
+        return new \SoapClient($wsdl, $options);
     }
 
     public static function getSoapCalcPrecoPrazo()
@@ -82,26 +95,26 @@ class SoapClientFactory
         if (!self::$_soapCalcPrecoPrazo) {
             $wsdl = Bootstrap::getConfig()->getWsdlCalcPrecoPrazo();
 
-            $opts = array(
-                'ssl' => array(
-                    'ciphers'           =>'RC4-SHA',
-                    'verify_peer'       =>false,
-                    'verify_peer_name'  =>false
-                )
-            );
+            $opts = [
+                'ssl' => [
+                    'ciphers'          => 'RC4-SHA',
+                    'verify_peer'      => false,
+                    'verify_peer_name' => false,
+                ],
+            ];
             // SOAP 1.1 client
-            $params = array (
-                'encoding'              => self::WEB_SERVICE_CHARSET,
-                'verifypeer'            => false,
-                'verifyhost'            => false,
-                'soap_version'          => SOAP_1_1,
-                'trace'                 => Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
-                'exceptions'            => Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
-                "connection_timeout"    => 180,
-                'stream_context'        => stream_context_create($opts)
-            );
+            $params = [
+                'encoding'           => self::WEB_SERVICE_CHARSET,
+                'verifypeer'         => false,
+                'verifyhost'         => false,
+                'soap_version'       => SOAP_1_1,
+                'trace'              => Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
+                'exceptions'         => Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
+                "connection_timeout" => 180,
+                'stream_context'     => stream_context_create($opts),
+            ];
 
-            self::$_soapCalcPrecoPrazo = new \SoapClient($wsdl, $params);
+            self::$_soapCalcPrecoPrazo = self::newSoapClient($wsdl, $params);
         }
 
         return self::$_soapCalcPrecoPrazo;
@@ -112,26 +125,26 @@ class SoapClientFactory
         if (!self::$_soapRastrearObjetos) {
             $wsdl = Bootstrap::getConfig()->getWsdlRastrearObjetos();
 
-            $opts = array(
-                'ssl' => array(
+            $opts = [
+                'ssl' => [
                     //'ciphers'           =>'RC4-SHA',
-                    'verify_peer'       =>false,
-                    'verify_peer_name'  =>false
-                )
-            );
+                    'verify_peer'      => false,
+                    'verify_peer_name' => false,
+                ],
+            ];
             // SOAP 1.1 client
-            $params = array (
-                'encoding'              => self::WEB_SERVICE_CHARSET,
-                'verifypeer'            => false,
-                'verifyhost'            => false,
-                'soap_version'          => SOAP_1_1,
-                'trace'                 => Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
-                'exceptions'            => Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
-                "connection_timeout"    => 180,
-                'stream_context'        => stream_context_create($opts)
-            );
+            $params = [
+                'encoding'           => self::WEB_SERVICE_CHARSET,
+                'verifypeer'         => false,
+                'verifyhost'         => false,
+                'soap_version'       => SOAP_1_1,
+                'trace'              => Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
+                'exceptions'         => Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
+                'connection_timeout' => 180,
+                'stream_context'     => stream_context_create($opts),
+            ];
 
-            self::$_soapRastrearObjetos = new \SoapClient($wsdl, $params);
+            self::$_soapRastrearObjetos = self::newSoapClient($wsdl, $params);
         }
 
         return self::$_soapRastrearObjetos;
@@ -144,8 +157,8 @@ class SoapClientFactory
      */
     public static function convertEncoding($string)
     {
-        $to     = 'UTF-8';
-        $from   = self::WEB_SERVICE_CHARSET;
+        $to = 'UTF-8';
+        $from = self::WEB_SERVICE_CHARSET;
         $str = false;
 
         if (function_exists('iconv')) {

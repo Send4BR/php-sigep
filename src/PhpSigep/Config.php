@@ -1,4 +1,5 @@
 <?php
+
 namespace PhpSigep;
 
 use PhpSigep\Cache\Options;
@@ -31,7 +32,7 @@ class Config extends DefaultStdClass
      * @var
      */
     const WSDL_LOGISTICA_REVERSA_PRODUCTION = 'https://cws.correios.com.br/logisticaReversaWS/logisticaReversaService/logisticaReversaWS?wsdl';
-                                                 //https://cws.correios.com.br/logisticaReversaWS/logisticaReversaService/logisticaReversaWS?wsdl
+    //https://cws.correios.com.br/logisticaReversaWS/logisticaReversaService/logisticaReversaWS?wsdl
 //    const WSDL_LOGISTICA_REVERSA_PRODUCTION = 'https://s3.amazonaws.com/send4public/AtendeCliente.xml?wsdl';
 //    const WSDL_LOGISTICA_REVERSA_PRODUCTION = 'https://s3.amazonaws.com/send4public/correio-reverso.wsdl';
     /**
@@ -98,13 +99,22 @@ class Config extends DefaultStdClass
      * @var AccessData
      */
     protected $accessData;
+    /**
+     * @var bool
+     */
+    private $logisticaReversa = false;
+
+    /**
+     * @var bool
+     */
+    private $useCURLClient = false;
 
     /**
      * @param array $configData
      *      Qualquer atributo desta classe pode ser usado como uma chave deste array.
      *      Ex: array('cacheOptions' => ...)
      */
-    public function __construct(array $configData = array())
+    public function __construct(array $configData = [])
     {
         $this->setAccessData(new AccessDataHomologacao());
 
@@ -118,25 +128,6 @@ class Config extends DefaultStdClass
     public function getEnv()
     {
         return (int)$this->env;
-    }
-
-    /**
-     * @param \PhpSigep\Model\AccessData $accessData
-     * @return $this;
-     */
-    public function setAccessData(\PhpSigep\Model\AccessData $accessData)
-    {
-        $this->accessData = $accessData;
-
-        return $this;
-    }
-
-    /**
-     * @return \PhpSigep\Model\AccessData
-     */
-    public function getAccessData()
-    {
-        return $this->accessData;
     }
 
     /**
@@ -163,7 +154,7 @@ class Config extends DefaultStdClass
                 } else {
                     $this->setWsdlLogisticaReversa(self::WSDL_LOGISTICA_REVERSA_PRODUCTION);
                 }
-            }  else {
+            } else {
                 if ($env == self::ENV_DEVELOPMENT) {
                     $this->setWsdlAtendeCliente(self::WSDL_ATENDE_CLIENTE_DEVELOPMENT);
                 } else {
@@ -176,7 +167,47 @@ class Config extends DefaultStdClass
         return $this;
     }
 
-    public function getWsdlLogisticaReversa ()
+    /**
+     *
+     * @return bool
+     */
+    public function getLogisticaReversa()
+    {
+        return $this->logisticaReversa;
+    }
+
+    /**
+     * Define se a requisição é para logistica reversa.
+     * @access public
+     * @param bool $logisticaReversa
+     * @return Config
+     */
+    public function setLogisticaReversa($logisticaReversa)
+    {
+        $this->logisticaReversa = $logisticaReversa;
+        return $this;
+    }
+
+    /**
+     * @return \PhpSigep\Model\AccessData
+     */
+    public function getAccessData()
+    {
+        return $this->accessData;
+    }
+
+    /**
+     * @param \PhpSigep\Model\AccessData $accessData
+     * @return $this;
+     */
+    public function setAccessData(\PhpSigep\Model\AccessData $accessData)
+    {
+        $this->accessData = $accessData;
+
+        return $this;
+    }
+
+    public function getWsdlLogisticaReversa()
     {
         return $this->wsdlLogisticaReversa;
     }
@@ -231,6 +262,14 @@ class Config extends DefaultStdClass
     }
 
     /**
+     * @return string
+     */
+    public function getWsdlRastrearObjetos()
+    {
+        return $this->wsdlRastrearObjetos;
+    }
+
+    /**
      * @param $wsdlRastrearObjetos
      * @return $this
      */
@@ -242,11 +281,11 @@ class Config extends DefaultStdClass
     }
 
     /**
-     * @return string
+     * @return boolean
      */
-    public function getWsdlRastrearObjetos()
+    public function getSimular()
     {
-        return $this->wsdlRastrearObjetos;
+        return $this->simular;
     }
 
     /**
@@ -258,11 +297,15 @@ class Config extends DefaultStdClass
     }
 
     /**
-     * @return boolean
+     * @return Options
      */
-    public function getSimular()
+    public function getCacheOptions()
     {
-        return $this->simular;
+        if ($this->cacheOptions === null) {
+            $this->setCacheOptions(new Options());
+        }
+
+        return $this->cacheOptions;
     }
 
     /**
@@ -277,15 +320,27 @@ class Config extends DefaultStdClass
     }
 
     /**
-     * @return Options
+     * Este não é o melhor lugar para este método, mas dada a simplicidade do projeto ele pode ficar aqui por enquanto.
+     * @todo Criar um Service Manager para abstrair a criação dos objetos.
      */
-    public function getCacheOptions()
+    public function getCacheInstance()
     {
-        if ($this->cacheOptions === null) {
-            $this->setCacheOptions(new Options());
+        if (!$this->cacheInstance) {
+            $factory = $this->getCacheFactory();
+            $this->cacheInstance = $factory->createService($this);
         }
 
-        return $this->cacheOptions;
+        return $this->cacheInstance;
+    }
+
+    /**
+     * @return \PhpSigep\FactoryInterface
+     */
+    public function getCacheFactory()
+    {
+        $this->setCacheFactory($this->cacheFactory);
+
+        return $this->cacheFactory;
     }
 
     /**
@@ -306,53 +361,14 @@ class Config extends DefaultStdClass
         }
     }
 
-    /**
-     * @return \PhpSigep\FactoryInterface
-     */
-    public function getCacheFactory()
+    public function setUseCURLClient($useCURLClient)
     {
-        $this->setCacheFactory($this->cacheFactory);
+        $this->useCURLClient = $useCURLClient;
 
-        return $this->cacheFactory;
     }
 
-    /**
-     * Este não é o melhor lugar para este método, mas dada a simplicidade do projeto ele pode ficar aqui por enquanto.
-     * @todo Criar um Service Manager para abstrair a criação dos objetos.
-     */
-    public function getCacheInstance()
+    public function useCURLClient()
     {
-        if (!$this->cacheInstance) {
-            $factory             = $this->getCacheFactory();
-            $this->cacheInstance = $factory->createService($this);
-        }
-
-        return $this->cacheInstance;
-    }
-
-    /**
-     * @var bool
-     */
-    private $logisticaReversa = false;
-
-    /**
-     * Define se a requisição é para logistica reversa.
-     * @access public
-     * @param bool $logisticaReversa
-     * @return Config
-     */
-    public function setLogisticaReversa($logisticaReversa)
-    {
-        $this->logisticaReversa = $logisticaReversa;
-        return $this;
-    }
-
-    /**
-     *
-     * @return bool
-     */
-    public function getLogisticaReversa()
-    {
-        return $this->logisticaReversa;
+        return function_exists('curl_init') && $this->useCURLClient;
     }
 }
