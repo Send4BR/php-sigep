@@ -7,7 +7,7 @@
 
 namespace PhpSigep\Services\Real;
 
-use Api\PostalCodes\Soap\CURLSoapClient;
+
 use PhpSigep\Bootstrap;
 use PhpSigep\BootstrapException;
 use PhpSigep\Config;
@@ -86,6 +86,17 @@ class SoapClientFactory
                 return new CURLSoapClient($wsdl, $options);
             }
         } catch (BootstrapException $e) {
+        }
+        try {
+            $tmpFile = sys_get_temp_dir().'/'.md5($wsdl);
+            if (!\file_exists($tmpFile)) {
+                \copy($wsdl, $tmpFile);
+            }
+            if (time() - filemtime(sys_get_temp_dir().'/'.md5($wsdl)) > 60 * 60) {
+                \copy($wsdl, $tmpFile);
+            }
+            return new \SoapClient($tmpFile, $options);
+        } catch (\Exception $exception) {
         }
         return new \SoapClient($wsdl, $options);
     }
