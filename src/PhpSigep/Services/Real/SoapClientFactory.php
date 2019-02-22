@@ -34,7 +34,9 @@ class SoapClientFactory
     public static function getSoapClient($tracking = false)
     {
         if (!extension_loaded('soap')) {
-            throw new SoapExtensionNotInstalled('The "soap" module must be enabled in your PHP installation. The "soap" module is required in order to PHPSigep to make requests to the Correios WebService.');
+            throw new SoapExtensionNotInstalled(
+                'The "soap" module must be enabled in your PHP installation. The "soap" module is required in order to PHPSigep to make requests to the Correios WebService.'
+            );
         }
 
         $wsdl = Bootstrap::getConfig()->getWsdlAtendeCliente();
@@ -64,8 +66,8 @@ class SoapClientFactory
             'verifypeer'         => false,
             'verifyhost'         => false,
             'soap_version'       => SOAP_1_1,
-            'trace'              => (int)Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
-            'exceptions'         => (bool)Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
+            'trace'              => (int) Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
+            'exceptions'         => (bool) Bootstrap::getConfig()->getEnv() != Config::ENV_PRODUCTION,
             'connection_timeout' => 180,
             'stream_context'     => stream_context_create($opts),
             'wsdl_cache'         => WSDL_CACHE_BOTH,
@@ -81,12 +83,14 @@ class SoapClientFactory
 
     private static function newSoapClient($wsdl, $options)
     {
+        $options['wsdl_cache'] = WSDL_CACHE_BOTH;
         try {
             if (Bootstrap::getConfig()->useCURLClient()) {
                 return new CURLSoapClient($wsdl, $options);
             }
         } catch (BootstrapException $e) {
         }
+
         return new \SoapClient($wsdl, $options);
     }
 
@@ -152,7 +156,9 @@ class SoapClientFactory
 
     /**
      * Se possível converte a string recebida.
+     *
      * @param $string
+     *
      * @return bool|string
      */
     public static function convertEncoding($string)
@@ -162,7 +168,7 @@ class SoapClientFactory
         $str = false;
 
         if (function_exists('iconv')) {
-            $str = iconv($from, $to . '//TRANSLIT', $string);
+            $str = iconv($from, $to.'//TRANSLIT', $string);
         } elseif (function_exists('mb_convert_encoding')) {
             $str = mb_convert_encoding($string, $to, $from);
         }
