@@ -17,7 +17,7 @@ class AccessDataHomologacao extends AccessData
             'codAdministrativo' => ($reverso ? '17000190' : '08082650'),
             'numeroContrato'    => ($reverso ? '9992157880' : '9912208555'),
             'cartaoPostagem'    => ($reverso ? '0067599079' : '0057018901'),
-            'codigoServico'     => ($reverso ? '04677' : ''),
+            'codigoServico'     => ($reverso ? '04936' : ''),
             'cnpjEmpresa'       => '34028316000103', // Obtido no método 'buscaCliente'.
             'anoContrato'       => null, // Não consta no manual.
             'diretoria'         => new Diretoria(Diretoria::DIRETORIA_DR_BRASILIA), // Obtido no método 'buscaCliente'.
