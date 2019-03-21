@@ -50,7 +50,11 @@ class SoapClientFactory
          */
 
         $opts = [
-            'ssl' => [
+            'http' => [
+                'protocol_version' => '1.1',
+                'header'           => 'Connection: Close',
+            ],
+            'ssl'  => [
                 //'ciphers'           =>'RC4-SHA', // comentado o parâmetro ciphers devido ao erro que ocorre quando usado dados de ambiente de produção em um servidor local conforme issue https://github.com/stavarengo/php-sigep/issues/35#issuecomment-290081903
                 'verify_peer'       => false,
                 'verify_peer_name'  => false,
@@ -81,6 +85,23 @@ class SoapClientFactory
 
     private static function newSoapClient($wsdl, $options)
     {
+        if(!isset($options['wsdl_cache'])){
+            $options['wsdl_cache']=WSDL_CACHE_BOTH;
+        }
+        if(!isset($options['stream_context'])){
+            $options['stream_context']     =stream_context_create([
+                'http' => [
+                    'protocol_version' => '1.1',
+                    'header'           => 'Connection: Close',
+                ],
+                'ssl'  => [
+                    //'ciphers'           =>'RC4-SHA', // comentado o parâmetro ciphers devido ao erro que ocorre quando usado dados de ambiente de produção em um servidor local conforme issue https://github.com/stavarengo/php-sigep/issues/35#issuecomment-290081903
+                    'verify_peer'       => false,
+                    'verify_peer_name'  => false,
+                    'allow_self_signed' => true,
+                ],
+            ]);
+        }
         try {
             if (Bootstrap::getConfig()->useCURLClient()) {
                 return new CURLSoapClient($wsdl, $options);
@@ -96,7 +117,11 @@ class SoapClientFactory
             $wsdl = Bootstrap::getConfig()->getWsdlCalcPrecoPrazo();
 
             $opts = [
-                'ssl' => [
+                'http' => [
+                    'protocol_version' => '1.1',
+                    'header'           => 'Connection: Close',
+                ],
+                'ssl'  => [
                     'ciphers'          => 'RC4-SHA',
                     'verify_peer'      => false,
                     'verify_peer_name' => false,
@@ -126,6 +151,10 @@ class SoapClientFactory
             $wsdl = Bootstrap::getConfig()->getWsdlRastrearObjetos();
 
             $opts = [
+                'http' => [
+                    'protocol_version' => '1.1',
+                    'header'           => 'Connection: Close',
+                ],
                 'ssl' => [
                     //'ciphers'           =>'RC4-SHA',
                     'verify_peer'      => false,
