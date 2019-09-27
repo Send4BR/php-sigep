@@ -33,6 +33,7 @@ class LogisticaReversa extends Bootstrap {
 
     const TIPO_COLETA = 'C';
     const TIPO_POSTAGEM = 'A';
+    const TIPO_COLETA_OU_POSTAGEM = 'CA';
 
     /**
      * LogisticaReversa constructor.
@@ -215,7 +216,7 @@ class LogisticaReversa extends Bootstrap {
 
         return $phpSigep->cancelarPostagemReversa($cancelaPostagem)->getResult();
     }
-    
+
     public function trackingObjectNumber ($data)
     {
 
@@ -251,13 +252,13 @@ class LogisticaReversa extends Bootstrap {
 }
 
 function isEmbalagemValid($embalagem) {
-    if (!isset($embalagem['tipo']) || 
+    if (!isset($embalagem['tipo']) ||
         !isValidValue($embalagem['tipo']) ||
-        !isset($embalagem['codigo']) || 
+        !isset($embalagem['codigo']) ||
         !isValidValue($embalagem['codigo']) ||
         !isset($embalagem['qtd']) ||
         !isValidValue($embalagem['qtd'])) {
-        
+
         return false;
     }
     return true;
